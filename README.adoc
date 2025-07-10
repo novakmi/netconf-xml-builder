@@ -18,88 +18,193 @@ endif::[]
 :Date:      2025-01-28
 :Revision:  0.1.0
 
-== Introduction
+== Project Description
 
-The `nertconf-xml-builder` is library helping to create NETCONF XML messages.
+`netconf-xml-builder` is a modern, lightweight Python library for programmatically building NETCONF XML messages. It provides decorators and helper functions to easily generate standards-compliant NETCONF requests, such as `<hello>`, `<commit>`, `<get-config>`, and custom RPCs. The library is designed for automation, testing, and integration with NETCONF-enabled devices and systems. It is ideal for network engineers, testers, and developers who need to automate NETCONF workflows or prototype new NETCONF-based tools.
 
+== Features
+
+* Simple Python API for generating NETCONF XML
+* Decorator-based approach for custom RPCs
+* Pretty-printed XML output
+* Support for message-id, custom tags, and filters
+* Combine multiple messages for batch operations
+* Easily extensible for custom NETCONF operations
+* Python 3.7+ support
 
 == Installation
 
-=== `pip3` installation
-
-You can install `netconf-xml-builder` plugin with `pip3`.
-
-.Install from https://pypi.org/ (TODO)
+=== Install from PyPI (planned)
 ----
 pip3 install netconf-xml-builder
 ----
 
-.Clone repository and install from the directory.
+=== Install from source
 ----
 git clone https://github.com/novakmi/netconf-xml-builder.git
 pip3 install netconf-xml-builder/
 ----
-NOTE: Or `pip3 install .` from `netconf-xml-builder` directory.
-
-
-.Uninstall plugin.
+Or from the project directory:
 ----
-pip3 uninstall netconf-xml-builder
+pip3 install .
 ----
 
-=== `PYTHONPATH` installation
+=== Using PYTHONPATH
+Set PYTHONPATH to the `netconf-xml-builder/src` directory:
+----
+export PYTHONPATH=./src:$PYTHONPATH
+----
 
-Set PYTHONPATH to  `netconf-xml-builder/src` directory
-(e.g. `export PYTHONPATH=./src:$PYTHONPATH`).
+== Quick Start
 
-== Quick start
+. Set up your environment (see Installation above).
+. Import the library and generate a NETCONF message:
 
-TODO
+[source,python]
+----
+from netconf_xml_builder import netconf_hello, pretty_xml
 
-== User guide
+hello_elem = netconf_hello()
+print(pretty_xml(hello_elem))
+----
 
-TODO
-(See `src` and `tests` directory for now)
+== Examples
+
+=== Generate a <hello> message
+[source,python]
+----
+from netconf_xml_builder import netconf_hello, pretty_xml
+hello_elem = netconf_hello()
+print(pretty_xml(hello_elem))
+----
+
+=== Generate a <commit> message with persist
+[source,python]
+----
+from netconf_xml_builder import netconf_commit, pretty_xml
+commit_elem = netconf_commit(persist="my-persist-id")
+print(pretty_xml(commit_elem))
+----
+
+=== Generate a <close-session> message
+[source,python]
+----
+from netconf_xml_builder import netconf_close_session, pretty_xml
+close_elem = netconf_close_session(message_id=42)
+print(pretty_xml(close_elem))
+----
+
+=== Generate a <get-config> message
+[source,python]
+----
+from netconf_xml_builder import netconf_get_config, pretty_xml
+get_config_elem = netconf_get_config()
+print(pretty_xml(get_config_elem))
+----
+
+=== Generate a <get> message with a filter
+[source,python]
+----
+from netconf_xml_builder import netconf_get, pretty_xml
+from xml.etree.ElementTree import Element
+
+def filter_fun(parent):
+    f = Element('filter')
+    f.text = 'interface-config'
+    parent.append(f)
+
+get_elem = netconf_get(filter_fun=filter_fun)
+print(pretty_xml(get_elem))
+----
+
+=== Combine multiple messages
+[source,python]
+----
+from netconf_xml_builder import make_netconf_message, netconf_hello, netconf_commit, netconf_close_session
+messages = [netconf_hello(), netconf_commit(), netconf_close_session()]
+print(make_netconf_message(messages))
+----
+
+=== Custom NETCONF RPC with @netconf_xml
+[source,python]
+----
+from netconf_xml_builder import netconf_xml, pretty_xml
+from xml.etree.ElementTree import SubElement
+
+@netconf_xml(tag="my-custom-rpc")
+def my_rpc(nce, foo, bar):
+    op = SubElement(nce, "my-op")
+    SubElement(op, "foo").text = str(foo)
+    SubElement(op, "bar").text = str(bar)
+    return nce
+
+custom_elem = my_rpc(foo="hello", bar=123)
+print(pretty_xml(custom_elem))
+----
+
+== User Guide
+
+* The `src/` and `tests/` directories contain more advanced usage and test cases.
+* The `src/example_usage.py` script demonstrates all main features and custom RPC creation.
+* All main functions are documented with Python docstrings.
+
+== API Reference
+
+* `netconf_hello()` - Generate a NETCONF <hello> message
+* `netconf_commit()` - Generate a <commit> message
+* `netconf_close_session()` - Generate a <close-session> message
+* `netconf_get_config()` - Generate a <get-config> message
+* `netconf_get()` - Generate a <get> message, optionally with a filter
+* `netconf_delimiter()` - Get the NETCONF message delimiter
+* `make_netconf_message()` - Combine multiple NETCONF messages
+* `pretty_xml()` - Pretty-print an XML Element
+* `netconf_xml` - Decorator for custom NETCONF RPCs
 
 == Tests
 
-Run full `tox` tests
-
+Run all tests with tox:
 [source,bash]
 ----
 tox
 ----
 
-Run full `tox`  `pytest`  tests
+Run only pytest tests:
 [source,bash]
 ----
 tox -e py
 ----
 
-Run full `tox`  `flake8`  tests
+Run only flake8 checks:
 [source,bash]
 ----
 tox -e flake8
 ----
 
-Run  `pytest` tests
-
+Run pytest directly:
 [source,bash]
 ----
 pytest -o log_cli=true -o log_cli_level=DEBUG tests/
 ----
 
-== Planned features
+== Contributing
 
-* improve code documentation
-* examples
-* pipy.org package
+Contributions, bug reports, and feature requests are welcome! Please open an issue or pull request on GitHub.
+
+== Planned Features
+
+* Improved code documentation
+* More examples and advanced usage
+* PyPI package release
+* Type stubs and type hints for all public APIs
+* More NETCONF operations and templates
 
 == Links
 
-pytest     https://pytest.org +
+* https://github.com/novakmi/netconf-xml-builder
+* https://pytest.org
+* https://datatracker.ietf.org/doc/html/rfc6241 (NETCONF RFC)
 
+=== Similar or related Projects
 
-=== Similar projects
-
-TODO
+* ncclient: Python library for NETCONF clients https://github.com/ncclient/ncclient
+* netconf-console2: https://pypi.org/project/netconf-console2/

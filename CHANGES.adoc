@@ -1,0 +1,8 @@
+=== 2025-07-10  0.1.0
+
+* Initial release
+* Project structure, documentation, and examples
+* Python NETCONF XML builder core features
+* Decorator for custom NETCONF RPCs
+* Pretty-printing, message delimiter, and message combination utilities
+* Example usage and tests
