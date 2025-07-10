@@ -70,6 +70,12 @@ Run full `tox` tests
 tox
 ----
 
+Run full `tox`  `pytest`  tests
+[source,bash]
+----
+tox -e py
+----
+
 Run full `tox`  `flake8`  tests
 [source,bash]
 ----
