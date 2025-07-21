@@ -1,4 +1,6 @@
-from netconf_xml_builder import netconf_hello, netconf_commit, pretty_xml, netconf_close_session, netconf_get_config, netconf_get, netconf_delimiter, make_netconf_message, netconf_xml
+from netconf_xml_builder import netconf_hello, netconf_commit, pretty_xml, \
+    netconf_close_session, netconf_get_config, netconf_get, netconf_delimiter, \
+    make_netconf_message, netconf_xml
 
 # Generate a <hello> message
 hello_elem = netconf_hello()
@@ -20,6 +22,7 @@ get_config_elem = netconf_get_config()
 print("\nNETCONF <get-config> message:")
 print(pretty_xml(get_config_elem))
 
+
 # Generate a <get> message with a filter
 
 def filter_fun(parent):
@@ -27,6 +30,7 @@ def filter_fun(parent):
     f = Element('filter')
     f.text = 'interface-config'
     parent.append(f)
+
 
 get_elem = netconf_get(filter_fun=filter_fun)
 print("\nNETCONF <get> message with filter:")
@@ -41,16 +45,19 @@ messages = [hello_elem, commit_elem, close_elem]
 print("\nCombined NETCONF messages:")
 print(make_netconf_message(messages))
 
+
 # Example of using the netconf_xml decorator directly
 def custom_operation(nce):
     from xml.etree.ElementTree import SubElement
     SubElement(nce, "custom-op").text = "custom-value"
     return nce
 
+
 custom_op = netconf_xml("rpc")(custom_operation)
 custom_elem = custom_op()
 print("\nCustom NETCONF operation:")
 print(pretty_xml(custom_elem))
+
 
 # Example of using the netconf_xml decorator directly with @netconf_xml
 
@@ -62,9 +69,11 @@ def another_custom_rpc(nce, foo, bar):
     SubElement(op, "bar").text = str(bar)
     return nce
 
+
 custom_elem3 = another_custom_rpc(foo="world", bar=456)
 print("\nCustom NETCONF operation using @netconf_xml:")
 print(pretty_xml(custom_elem3))
+
 
 # Example of using the netconf_xml decorator directly with @netconf_xml and a custom tag
 
@@ -75,6 +84,7 @@ def tagged_custom_rpc(nce, foo, bar):
     SubElement(op, "foo").text = str(foo)
     SubElement(op, "bar").text = str(bar)
     return nce
+
 
 custom_elem4 = tagged_custom_rpc(foo="tagged", bar=789)
 print("\nCustom NETCONF operation using @netconf_xml(tag='my-rpc-tag'):")
